@@ -26,7 +26,7 @@ docker run -v /path/to/data:/data -p 7777:7777/udp -e CD_KEY=YOUR-CDKEY-HERE -e 
 - `-e PUID=1000`: The user ID you want this server to run as.
 - `-e PGID=1000`: You can also specify a group ID. If not specified, it defaults to whatever PUID is set to.
 - `-e TZ=America/Detroit`: You can specify the timezone that you want the server to run in. Useful for logging.
-- `-e DOWNLOAD_DATA=1`: In order to actually initiate the downloads, this must be set to 1. Setting this to 1 means that you understand that ~750MB of data will be downloaded and extracted (~2.8GB) to the mounted `/data` directory.
+- `-e DOWNLOAD_DATA=true`: In order to actually initiate the downloads, this must be set to `true`. Setting this to `true` means that you understand that ~750MB of data will be downloaded and extracted (~2.8GB) to the mounted `/data` directory.
 
 ## Folder Layout
 The `/data` folder will have three main folders:
@@ -53,7 +53,7 @@ The right number is the port (and protocol) defined in your `UT2004.ini` file, a
 - `COMPRESS_DIR` (default is empty) - If you want to compress all of your server files to set up a redirect download server, set this environment variable to a directory (such as `/compressed`). Then, have a volume mount to that directory to access the compressed files. Any file not found in that folder will be compressed there.
 - `SERVER_START_EXTRAS` (default is empty) - If you need to add any other parameters to the server launch command, put them in this variable. For example to use UT2Vote, you need to set this to `?Mutator=UT2Vote61.UT2VoteX`
 - `SERVER_START_COMMAND` (default is `DM-Antalus?game=xGame.xDeathMatch`) - If you need to change the actual server start command (for instance, to change the first gametype and map), set this variable.
-- `SKIP_INSTALL` (default is empty) - If you don't want to download/update your server files, set this to `1`. I assume you know what you're doing. Maybe manually installing your own server to the `/data/server` folder or something? I don't know.
+- `SKIP_INSTALL` (default is empty) - If you don't want to download/update your server files, set this to `true`. I assume you know what you're doing. Maybe manually installing your own server to the `/data/server` folder or something? I don't know.
 
 ## A Note On Downloading the Server
 All of the official server downloads hosted in variaous locations all had issues, such as incorrect filename casing (leading to duplicated non-patched files on Linux), the UWeb and CSS problems, or some archives extracting incorrectly. I have taken the time to compile the server, both bonus packs, and the latest patches (which patch the bonus packs, hence why they were included) and made a nice compressed archive. However, I can't host a ~750MB file myself, due to residential bandwith caps and upload speeds. If for some reason my chosen host does not work (link is too popular), let me know and I will update the installer.

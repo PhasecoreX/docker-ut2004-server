@@ -1,9 +1,10 @@
 #!/usr/bin/env sh
-set -e
+set -euf
 
-# Check if the user actually reads instructions
-if [ $(stat -c "%d" /) -eq $(stat -c "%d" /data) ]; then
-    echo "Try reading the instructions before running this image!"
+# Check if the user actually volume/bind mounted the /data directory
+if [ "$(stat -c "%d" /)" -eq "$(stat -c "%d" /data)" ]; then
+    echo ""
+    echo "Try reading the instructions before running this image!" >&2
     exit 1
 fi
 
@@ -29,9 +30,11 @@ mkdir -p /data/addons/Textures
 mkdir -p /data/config
 
 # Move any .ini files and cdkey (not symlinked) in System directories into /data/config (no overwrite)
+set +f
 find /data/addons/System/ /data/server/System/ -type f \( -name '*.ini' -o -name 'cdkey' \) -exec mv -n -t /data/config {} +
 rm -f /data/addons/System/*.ini /data/server/System/*.ini /data/server/System/cdkey
 ln -s /data/config/* /data/server/System/
+set -f
 
 # Fix up (users) UT2004.ini to have /data/addons folders defined
 if ! grep -Fxq "Paths=/data/addons/Saves/*.uvx" /data/config/UT2004.ini; then
@@ -60,8 +63,8 @@ if ! grep -Fxq "Paths=/data/addons/System/*.u" /data/config/UT2004.ini; then
 fi
 
 # If $CD_KEY is defined, update the server key
-if ! [ -z ${CD_KEY+x} ]; then
-    echo \"CDKey\"=\"${CD_KEY}\" > /data/config/cdkey
+if [ -n "${CD_KEY:-}" ]; then
+    echo \"CDKey\"=\""${CD_KEY}"\" >/data/config/cdkey
 fi
 
 # If $COMPRESS_DIR is defined, compress.sh will compress files into it
@@ -69,4 +72,4 @@ fi
 
 # Finally, run the server
 echo "Starting server..."
-exec ./ucc-bin server "${SERVER_START_COMMAND}${SERVER_START_EXTRAS}" ini=UT2004.ini -nohomedir
+exec ./ucc-bin server "${SERVER_START_COMMAND:-"DM-Antalus?game=xGame.xDeathMatch"}${SERVER_START_EXTRAS:-}" ini=UT2004.ini -nohomedir

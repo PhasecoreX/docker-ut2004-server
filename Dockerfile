@@ -1,8 +1,5 @@
 FROM phasecorex/user-debian:10-slim as server
 
-# Set environment variables
-ENV SERVER_START_COMMAND DM-Antalus?game=xGame.xDeathMatch
-
 # Install dependencies to run the server
 RUN set -eux; \
     dpkg --add-architecture i386; \
@@ -28,8 +25,6 @@ COPY root/ /
 # 7778  UDP/IP  (Query Port; game port + 1)
 # 7787  UDP/IP  (GameSpy Query Port; game port + 10)
 EXPOSE 7777/udp 7778/udp 7787/udp
-
-VOLUME /data
 
 CMD ["/bin/sh", "/app/start_server.sh"]
 

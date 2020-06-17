@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-set -e
+set -eu
 
 # exit if there is no target directory
-if [ -z ${COMPRESS_DIR+x} ]; then
-  exit 0
+if [ -z "${COMPRESS_DIR:-}" ]; then
+    exit 0
 fi
 
 echo "Checking for files to compress..."
@@ -59,21 +59,21 @@ if ls /data/addons/Textures/*.utx >/dev/null 2>&1; then
 fi
 
 for sourcepath in "${files[@]}"; do
-  filename=$(basename "${sourcepath}")          # get source filename without directory
-  destination="${COMPRESS_DIR}/${filename}.uz2" # compressed file's path
-  sourcedate=$(stat -c %Y "${sourcepath}")      # get source file's modification date
+    filename=$(basename "${sourcepath}")          # get source filename without directory
+    destination="${COMPRESS_DIR}/${filename}.uz2" # compressed file's path
+    sourcedate=$(stat -c %Y "${sourcepath}")      # get source file's modification date
 
-  # skip compression if compressed file already exists and timestamp matches the source
-  if [ -e "${destination}" ]; then
-    destinationdate=$(stat -c %Y "${destination}") # get compressed file's modification date
-    if [ "${sourcedate}" -eq "${destinationdate}" ]; then
-      # echo "already compressed ${sourcepath}"
-      continue
+    # skip compression if compressed file already exists and timestamp matches the source
+    if [ -e "${destination}" ]; then
+        destinationdate=$(stat -c %Y "${destination}") # get compressed file's modification date
+        if [ "${sourcedate}" -eq "${destinationdate}" ]; then
+            # echo "already compressed ${sourcepath}"
+            continue
+        fi
     fi
-  fi
 
-  ./ucc-bin compress "${sourcepath}" -nohomedir # compress the source file
-  mv -f "${sourcepath}.uz2" "${destination}"    # move compressed file to the destination
-  chmod o+r "${destination}"                    # add read permission to compressed file
-  touch -d "@${sourcedate}" "${destination}"    # change modification date of compressed file to match the source
+    ./ucc-bin compress "${sourcepath}" -nohomedir # compress the source file
+    mv -f "${sourcepath}.uz2" "${destination}"    # move compressed file to the destination
+    chmod o+r "${destination}"                    # add read permission to compressed file
+    touch -d "@${sourcedate}" "${destination}"    # change modification date of compressed file to match the source
 done
