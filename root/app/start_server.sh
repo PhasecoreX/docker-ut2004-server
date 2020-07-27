@@ -37,6 +37,9 @@ ln -s /data/config/* /data/server/System/
 set -f
 
 # Fix up (users) UT2004.ini to have /data/addons folders defined
+if ! grep -Fxq "CacheRecordPath=/data/addons/System/*.ucl" /data/config/UT2004.ini; then
+    sed -i '/\[Core.System\]/a CacheRecordPath=/data/addons/System/*.ucl' /data/config/UT2004.ini
+fi
 if ! grep -Fxq "Paths=/data/addons/Saves/*.uvx" /data/config/UT2004.ini; then
     sed -i '/\[Core.System\]/a Paths=/data/addons/Saves/*.uvx' /data/config/UT2004.ini
 fi
