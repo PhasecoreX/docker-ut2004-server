@@ -2,8 +2,7 @@
 UT2004 Server, packaged nicely in a container
 
 [![Docker Pulls](https://img.shields.io/docker/pulls/phasecorex/ut2004-server)](https://hub.docker.com/r/phasecorex/ut2004-server)
-[![Image Size](https://images.microbadger.com/badges/image/phasecorex/ut2004-server.svg)](https://microbadger.com/images/phasecorex/ut2004-server)
-[![Build Status](https://img.shields.io/docker/build/phasecorex/ut2004-server)](https://hub.docker.com/r/phasecorex/ut2004-server)
+[![Build Status](https://github.com/PhasecoreX/docker-ut2004-server/workflows/build/badge.svg)](https://github.com/PhasecoreX/docker-ut2004-server/actions?query=workflow%3Abuild)
 [![BuyMeACoffee](https://img.shields.io/badge/buy%20me%20a%20coffee-donate-orange)](https://buymeacoff.ee/phasecorex)
 [![PayPal](https://img.shields.io/badge/paypal-donate-blue)](https://paypal.me/pcx)
 
