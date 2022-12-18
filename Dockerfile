@@ -1,4 +1,9 @@
-FROM phasecorex/user-debian:10-slim as server
+FROM debian:10-slim
+
+# Add PhasecoreX user-entrypoint script
+ADD https://raw.githubusercontent.com/PhasecoreX/docker-user-image/master/user-entrypoint.sh /bin/user-entrypoint
+RUN chmod +x /bin/user-entrypoint && /bin/user-entrypoint --init
+ENTRYPOINT ["/bin/user-entrypoint"]
 
 # Install dependencies to run the server
 RUN set -eux; \
