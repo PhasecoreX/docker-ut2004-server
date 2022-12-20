@@ -1,4 +1,4 @@
-FROM debian:10-slim
+FROM debian:11-slim
 
 # Add PhasecoreX user-entrypoint script
 ADD https://raw.githubusercontent.com/PhasecoreX/docker-user-image/master/user-entrypoint.sh /bin/user-entrypoint
@@ -15,7 +15,7 @@ RUN set -eux; \
         curl \
         xz-utils \
         # Server
-        lib32gcc1 \
+        lib32gcc-s1 \
         libstdc++5:i386 \
         libstdc++6:i386 \
         libsdl1.2debian \
@@ -31,6 +31,4 @@ COPY root/ /
 # 7787  UDP/IP  (GameSpy Query Port; game port + 10)
 EXPOSE 7777/udp 7778/udp 7787/udp
 
-CMD ["/bin/sh", "/app/start_server.sh"]
-
-LABEL maintainer="Ryan Foster <phasecorex@gmail.com>"
+CMD ["/app/start_server.sh"]
