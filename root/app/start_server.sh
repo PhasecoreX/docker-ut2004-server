@@ -8,17 +8,14 @@ if [ "$(stat -c "%d" /)" -eq "$(stat -c "%d" /data)" ]; then
     exit 1
 fi
 
-# Switch to the server System directory
-mkdir -p /data/server/System
-cd /data/server/System
-
 # Download/update server files
-/app/install.sh
+/app/install.sh /data/server
 
-# Make server executible
+# Switch to the server System directory, make server executible
+cd /data/server/System
 chmod +x ./ucc-bin
 
-# Make addons directories if they don't exist
+# Make config and addons directories if they don't exist
 mkdir -p /data/addons/Animations
 mkdir -p /data/addons/Maps
 mkdir -p /data/addons/Music
@@ -71,8 +68,14 @@ if [ -n "${CD_KEY:-}" ]; then
 fi
 
 # If $COMPRESS_DIR is defined, compress.sh will compress files into it
-/app/compress.sh
+if [ -n "${COMPRESS_DIR:-}" ]; then
+    /app/compress.sh "${COMPRESS_DIR}"
+fi
 
 # Finally, run the server
 echo "Starting server..."
-exec ./ucc-bin server "${SERVER_START_COMMAND:-"DM-Antalus?game=xGame.xDeathMatch"}${SERVER_START_EXTRAS:-}" ini=UT2004.ini -nohomedir
+server_command="${MAP_NAME:-"DM-Antalus"}?game=${GAME_TYPE:-"xGame.xDeathMatch"}"
+if [ -n "${MUTATORS:-}" ]; then
+    server_command="${server_command}?mutator=${MUTATORS}"
+fi
+exec ./ucc-bin server "${SERVER_START_COMMAND:-"${server_command}"}${SERVER_START_EXTRAS:-}" ini=UT2004.ini -nohomedir -lanplay

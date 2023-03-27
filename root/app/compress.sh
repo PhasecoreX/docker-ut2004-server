@@ -1,79 +1,92 @@
 #!/usr/bin/env bash
 set -eu
 
-# exit if there is no target directory
-if [ -z "${COMPRESS_DIR:-}" ]; then
+compress_dir=$1
+compress_ext="uz2"
+
+# Exit if no target directory was passed in
+if [ -z "${compress_dir:-}" ]; then
     exit 0
 fi
 
-echo "Checking for files to compress..."
+echo "Checking for new files to compress..."
 
-# create target directory, if needed
-mkdir -p "${COMPRESS_DIR}"
-
-# find all files to compress
-files=()
-# Server
-if ls /data/server/Animations/*.ukx >/dev/null 2>&1; then
-    files+=(/data/server/Animations/*.ukx)
-fi
-if ls /data/server/Maps/*.ut2 >/dev/null 2>&1; then
-    files+=(/data/server/Maps/*.ut2)
-fi
-if ls /data/server/Music/*.ogg >/dev/null 2>&1; then
-    files+=(/data/server/Music/*.ogg)
-fi
-if ls /data/server/Sounds/*.uax >/dev/null 2>&1; then
-    files+=(/data/server/Sounds/*.uax)
-fi
-if ls /data/server/StaticMeshes/*.usx >/dev/null 2>&1; then
-    files+=(/data/server/StaticMeshes/*.usx)
-fi
-if ls /data/server/System/*.u >/dev/null 2>&1; then
-    files+=(/data/server/System/*.u)
-fi
-if ls /data/server/Textures/*.utx >/dev/null 2>&1; then
-    files+=(/data/server/Textures/*.utx)
-fi
-# Addons
-if ls /data/addons/Animations/*.ukx >/dev/null 2>&1; then
-    files+=(/data/addons/Animations/*.ukx)
-fi
-if ls /data/addons/Maps/*.ut2 >/dev/null 2>&1; then
-    files+=(/data/addons/Maps/*.ut2)
-fi
-if ls /data/addons/Music/*.ogg >/dev/null 2>&1; then
-    files+=(/data/addons/Music/*.ogg)
-fi
-if ls /data/addons/Sounds/*.uax >/dev/null 2>&1; then
-    files+=(/data/addons/Sounds/*.uax)
-fi
-if ls /data/addons/StaticMeshes/*.usx >/dev/null 2>&1; then
-    files+=(/data/addons/StaticMeshes/*.usx)
-fi
-if ls /data/addons/System/*.u >/dev/null 2>&1; then
-    files+=(/data/addons/System/*.u)
-fi
-if ls /data/addons/Textures/*.utx >/dev/null 2>&1; then
-    files+=(/data/addons/Textures/*.utx)
+if [ ! -d "${compress_dir}" ]; then
+    echo "Destination directory does not exist: ${compress_dir}"
+    exit 1
 fi
 
-for sourcepath in "${files[@]}"; do
-    filename=$(basename "${sourcepath}")          # get source filename without directory
-    destination="${COMPRESS_DIR}/${filename}.uz2" # compressed file's path
-    sourcedate=$(stat -c %Y "${sourcepath}")      # get source file's modification date
-
-    # skip compression if compressed file already exists and timestamp matches the source
-    if [ -e "${destination}" ]; then
-        destinationdate=$(stat -c %Y "${destination}") # get compressed file's modification date
-        if [ "${sourcedate}" -eq "${destinationdate}" ]; then
-            # echo "already compressed ${sourcepath}"
-            continue
-        fi
+# Find all source file directories
+compressed_files=()
+for directory in /data/{addons,server}/{Animations,Maps,Music,Sounds,StaticMeshes,System,Textures}; do
+    if [ ! -d "${directory}" ]; then
+        continue
     fi
 
-    ./ucc-bin compress "${sourcepath}" -nohomedir # compress the source file
-    mv -f "${sourcepath}.uz2" "${destination}"    # move compressed file to the destination
-    chmod o+r "${destination}"                    # add read permission to compressed file
-    touch -d "@${sourcedate}" "${destination}"    # change modification date of compressed file to match the source
+    # Determine file extension we want to compress in this directory
+    case "${directory}" in
+        */Animations)
+            extension="ukx"
+        ;;
+        */Maps)
+            extension="ut2"
+        ;;
+        */Music)
+            extension="ogg"
+        ;;
+        */Sounds)
+            extension="uax"
+        ;;
+        */StaticMeshes)
+            extension="usx"
+        ;;
+        */System)
+            extension="u"
+        ;;
+        */Textures)
+            extension="utx"
+        ;;
+        *)
+            echo "Don't know how to handle ${directory}"
+            continue
+        ;;
+    esac
+
+    # Find all files to compress
+    readarray -d '' files < <(find "${directory}" -iname "*.${extension}" -type f -print0)
+    for sourcepath in "${files[@]}"; do
+
+        # Get source date and filename without directory, make sure we haven't already compressed it
+        filename=$(basename "${sourcepath}")
+        sourcedate=$(stat -c %Y "${sourcepath}")
+        if echo "${compressed_files[@]}" | grep -q -F --word-regexp "${filename}"; then
+            continue
+        fi
+        compressed_files+=("${filename}")
+        destination="${compress_dir}/${filename}.${compress_ext}"
+
+        # Skip compression if compressed file already exists and timestamp matches the source
+        if [ -f "${destination}" ]; then
+            destinationdate=$(stat -c %Y "${destination}")
+            if [ "${sourcedate}" -eq "${destinationdate}" ]; then
+                # echo "Already compressed ${sourcepath}"
+                continue
+            fi
+        fi
+
+        echo "Compressing ${sourcepath}..."
+        set +e
+        ./ucc-bin compress "${sourcepath}" -nohomedir
+        set -e
+        if [ -f "${sourcepath}.${compress_ext}" ]; then
+            # Move compressed file to destination, make it readable, update modification date
+            mv -f "${sourcepath}.${compress_ext}" "${destination}"
+            chmod +r "${destination}"
+            touch -d "@${sourcedate}" "${destination}"
+            # When ucc-bin compresses a file, it does all that match case insensitive. Delete the extras.
+            find "${directory}" -iname "${filename}.${compress_ext}" -type f -delete
+        else
+            echo "Failed to compress ${sourcepath}"
+        fi
+    done
 done
