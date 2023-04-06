@@ -65,6 +65,22 @@ for directory in /data/{addons,server}/{Animations,Maps,Music,Sounds,StaticMeshe
         compressed_files+=("${filename}")
         destination="${compress_dir}/${filename}.${compress_ext}"
 
+        # If this is a .u file, check that it is valid and if it's not ServerSideOnly
+        if [ "${filename##*.}" = "u" ] || [ "${filename##*.}" = "U" ]; then
+            header=$(od "${sourcepath}" -N 4 -An -t x1 | tr -d ' ')
+            if [ "${header}" != "c1832a9e" ]; then
+                echo "Skipping invalid .u file: ${sourcepath}"
+                continue
+            fi
+            flags=$(od "${sourcepath}" -j 8 -N 1 -An -t dI | tr -d ' ')
+            serversideonly_flag=$(( flags & 4 ))
+            if [ $serversideonly_flag != 0 ]; then
+                # Skip ServerSideOnly .u files. If we previously compressed this, remove it from compress dir
+                rm -f "${destination}"
+                continue
+            fi
+        fi
+
         # Skip compression if compressed file already exists and timestamp matches the source
         if [ -f "${destination}" ]; then
             destinationdate=$(stat -c %Y "${destination}")
