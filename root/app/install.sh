@@ -32,9 +32,21 @@ download_install() {
     echo "Downloading ${filename} archive..."
     mkdir -p "${version_directory}"
     if [ -z "${url##*'google.com'*}" ]; then
-        curl -#SL -c "${version_directory}/cookies.txt" "${url}" | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1/p' >"${version_directory}/confirm.txt"
-        curl -#SL -b "${version_directory}/cookies.txt" -o "${download_path}" "${url}&confirm=$(cat "${version_directory}/confirm.txt")"
-        rm -f "${version_directory}/confirm.txt" "${version_directory}/cookies.txt"
+        download_url="https://drive.usercontent.google.com/download"
+        # Get the "this file is really big" banner page:
+        curl -#SL -c "${version_directory}/cookies.txt" "${url}" -o "${version_directory}/confirm.html"
+
+        # Extract all confirmation parameters:
+        confirm="$(pup 'form#download-form > input[name=confirm] attr{value}' < "${version_directory}/confirm.html")"
+        uuid="$(pup 'form#download-form > input[name=uuid] attr{value}' < "${version_directory}/confirm.html")"
+        fileid="$(pup 'form#download-form > input[name=id] attr{value}' < "${version_directory}/confirm.html")"
+
+        # Prepare the "final" download URL and download the archive:
+        finalurl="${download_url}?id=${fileid}&export=download&confirm=${confirm}&uuid=${uuid}"
+        curl -#SL -b "${version_directory}/cookies.txt" -o "${download_path}" "${finalurl}"
+
+        # Clean up the cookies and confirmation page:
+        rm -f "${version_directory}/confirm.html" "${version_directory}/cookies.txt"
     else
         curl -#SL "${url}" -o "${download_path}"
     fi
