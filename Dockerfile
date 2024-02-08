@@ -13,13 +13,14 @@ RUN set -eux; \
         # Updater
         ca-certificates \
         curl \
+        pup \
         xz-utils \
         # Server
         lib32gcc-s1 \
         libstdc++5:i386 \
         libstdc++6:i386 \
         libsdl1.2debian \
-    ; \    
+    ; \
     rm -rf /var/lib/apt/lists/*
 
 # Add local files
