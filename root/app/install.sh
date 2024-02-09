@@ -32,11 +32,9 @@ download_install() {
     echo "Downloading ${filename} archive..."
     mkdir -p "${version_directory}"
     if [ -z "${url##*'google.com'*}" ]; then
-        curl -#SL -c "${version_directory}/cookies.txt" "${url}" | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1/p' >"${version_directory}/confirm.txt"
-        curl -#SL -b "${version_directory}/cookies.txt" -o "${download_path}" "${url}&confirm=$(cat "${version_directory}/confirm.txt")"
-        rm -f "${version_directory}/confirm.txt" "${version_directory}/cookies.txt"
+        curl -#SL -o "${download_path}" "${url}&export=download&confirm=t"
     else
-        curl -#SL "${url}" -o "${download_path}"
+        curl -#SL -o "${download_path}" "${url}"
     fi
 
     echo "Verifying md5 checksum ${md5}"
@@ -67,6 +65,6 @@ fi
 
 # Install base server with latest patch (3369.2), Epic ECE Bonus Pack, and Bonus Megapack
 download_install \
-    "https://drive.google.com/uc?export=download&id=1yK3QcsE0s-F5weMy-7ACUs-b9VS1AYD_" \
+    "https://drive.usercontent.google.com/download?id=1yK3QcsE0s-F5weMy-7ACUs-b9VS1AYD_" \
     5f9c999ed8f695a67877018ba6a12607 \
     ut2004server_base
