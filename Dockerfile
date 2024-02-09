@@ -13,7 +13,6 @@ RUN set -eux; \
         # Updater
         ca-certificates \
         curl \
-        pup \
         xz-utils \
         # Server
         lib32gcc-s1 \

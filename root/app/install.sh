@@ -32,23 +32,9 @@ download_install() {
     echo "Downloading ${filename} archive..."
     mkdir -p "${version_directory}"
     if [ -z "${url##*'google.com'*}" ]; then
-        download_url="https://drive.usercontent.google.com/download"
-        # Get the "this file is really big" banner page:
-        curl -#SL -c "${version_directory}/cookies.txt" "${url}" -o "${version_directory}/confirm.html"
-
-        # Extract all confirmation parameters:
-        confirm="$(pup 'form#download-form > input[name=confirm] attr{value}' < "${version_directory}/confirm.html")"
-        uuid="$(pup 'form#download-form > input[name=uuid] attr{value}' < "${version_directory}/confirm.html")"
-        fileid="$(pup 'form#download-form > input[name=id] attr{value}' < "${version_directory}/confirm.html")"
-
-        # Prepare the "final" download URL and download the archive:
-        finalurl="${download_url}?id=${fileid}&export=download&confirm=${confirm}&uuid=${uuid}"
-        curl -#SL -b "${version_directory}/cookies.txt" -o "${download_path}" "${finalurl}"
-
-        # Clean up the cookies and confirmation page:
-        rm -f "${version_directory}/confirm.html" "${version_directory}/cookies.txt"
+        curl -#SL -o "${download_path}" "${url}&export=download&confirm=t"
     else
-        curl -#SL "${url}" -o "${download_path}"
+        curl -#SL -o "${download_path}" "${url}"
     fi
 
     echo "Verifying md5 checksum ${md5}"
@@ -79,6 +65,6 @@ fi
 
 # Install base server with latest patch (3369.2), Epic ECE Bonus Pack, and Bonus Megapack
 download_install \
-    "https://drive.google.com/uc?export=download&id=1yK3QcsE0s-F5weMy-7ACUs-b9VS1AYD_" \
+    "https://drive.usercontent.google.com/download?id=1yK3QcsE0s-F5weMy-7ACUs-b9VS1AYD_" \
     5f9c999ed8f695a67877018ba6a12607 \
     ut2004server_base
