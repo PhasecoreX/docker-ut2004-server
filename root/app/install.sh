@@ -31,11 +31,7 @@ download_install() {
 
     echo "Downloading ${filename} archive..."
     mkdir -p "${version_directory}"
-    if [ -z "${url##*'google.com'*}" ]; then
-        curl -#SL -o "${download_path}" "${url}&export=download&confirm=t"
-    else
-        curl -#SL -o "${download_path}" "${url}"
-    fi
+    curl -#SL -o "${download_path}" "${url}"
 
     echo "Verifying md5 checksum ${md5}"
     echo "${md5} ${download_path}" | md5sum -c -
@@ -65,6 +61,6 @@ fi
 
 # Install base server with latest patch (3369.2), Epic ECE Bonus Pack, and Bonus Megapack
 download_install \
-    "https://drive.usercontent.google.com/download?id=1yK3QcsE0s-F5weMy-7ACUs-b9VS1AYD_" \
+    "https://drive.usercontent.google.com/download?id=1yK3QcsE0s-F5weMy-7ACUs-b9VS1AYD_&export=download&confirm=t" \
     5f9c999ed8f695a67877018ba6a12607 \
     ut2004server_base
