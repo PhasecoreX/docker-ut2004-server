@@ -54,13 +54,13 @@ version_directory="${server_directory}/.versions"
 force_update=0
 base_pack_installed=0
 
-# Update to new md5 (same files but compressed better)
-if [ -f "${version_directory}/ut2004server_base.txt" ] && [ "$(cat "${version_directory}/ut2004server_base.txt")" = "561a9e3a5df492c2246c0be002eaf76e" ]; then
-    echo "5f9c999ed8f695a67877018ba6a12607" >"${version_directory}/ut2004server_base.txt"
+# Update to new md5 (same files but compressed with zstd)
+if [ -f "${version_directory}/ut2004server_base.txt" ] && [ "$(cat "${version_directory}/ut2004server_base.txt")" = "5f9c999ed8f695a67877018ba6a12607" ]; then
+    echo "4de111e1e66a90d32ef59b61195376da" >"${version_directory}/ut2004server_base.txt"
 fi
 
 # Install base server with latest patch (3369.2), Epic ECE Bonus Pack, and Bonus Megapack
 download_install \
-    "https://drive.usercontent.google.com/download?id=1yK3QcsE0s-F5weMy-7ACUs-b9VS1AYD_&export=download&confirm=t" \
-    5f9c999ed8f695a67877018ba6a12607 \
+    "https://drive.usercontent.google.com/download?id=1RBHApIf3HU3d-b9lxRJbxVWZj6I6FWc4&export=download&confirm=t" \
+    4de111e1e66a90d32ef59b61195376da \
     ut2004server_base

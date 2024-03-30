@@ -13,7 +13,7 @@ RUN set -eux; \
         # Updater
         ca-certificates \
         curl \
-        xz-utils \
+        zstd \
         # Server
         lib32gcc-s1 \
         libstdc++5:i386 \
