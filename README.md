@@ -57,6 +57,11 @@ The right number is the port (and protocol) defined in your `UT2004.ini` file, a
 - `SERVER_START_COMMAND` (default is empty) - If you don't want to use the above 4 environment variables to specify map/gametype/mutators/extras, you can just specify the entire server start command here. All except SERVER_START_EXTRAS will be ignored (for legacy purposes, it's appended to the end of SERVER_START_COMMAND).
 - `COMPRESS_DIR` (default is empty) - If you want to compress all of your server files to set up a redirect download server, set this environment variable to a directory (such as `/compressed`). Then, have a volume mount to that directory to access the compressed files. Any file not found in that folder will be compressed there.
 - `SKIP_INSTALL` (default is empty) - If you don't want to download/update your server files, set this to `true`. I assume you know what you're doing. Maybe manually installing your own server to the `/data/server` folder or something? I don't know.
+- `SERVER_NAME` Set a server name
+- `GAME_DURATION` (default is 20 minutes) Set the duration of matches.
+- `ENABLE_WEB_INTERFACE` (default is off) Enable the Server Management web interface on port 80 by setting this variable to 1
+- `ADMIN_PASSWORD` Must be set to enable Web interface
+- `ENABLE_MAP_VOTING` Set this variable to "1" to enable Map voting during and at the end of matches.
 
 ## A Note On Downloading the Server
 All of the official server downloads hosted in various locations all had issues, such as incorrect filename casing (leading to duplicated non-patched files on Linux), the UWeb and CSS problems, or some archives extracting incorrectly. I have taken the time to compile the server, both bonus packs, and the latest patches (which patch the bonus packs, hence why they were included) and made a nice compressed archive. However, I can't host a ~750MB file myself, due to residential bandwith caps and upload speeds. If for some reason my chosen host does not work (link is too popular), let me know and I will update the installer.
