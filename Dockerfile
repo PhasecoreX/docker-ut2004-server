@@ -1,4 +1,4 @@
-FROM debian:12-slim
+FROM debian:13-slim
 
 # Add PhasecoreX user-entrypoint script
 ADD https://raw.githubusercontent.com/PhasecoreX/docker-user-image/master/user-entrypoint.sh /bin/user-entrypoint
@@ -9,18 +9,18 @@ ENTRYPOINT ["/bin/user-entrypoint"]
 RUN set -eux; \
     dpkg --add-architecture i386; \
     apt-get update; \
-    apt-get install -y --no-install-recommends  \
+    apt-get install -y --no-install-recommends \
         # Updater
         ca-certificates \
         curl \
         zstd \
         # Server
-        lib32gcc-s1 \
-        libstdc++5:i386 \
-        libstdc++6:i386 \
-        libsdl1.2debian \
+        libc6:i386 \
     ; \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/*; \
+    curl -SL -o ./libstdc++5_3.3.6-34_i386.deb http://ftp.debian.org/debian/pool/main/g/gcc-3.3/libstdc++5_3.3.6-34_i386.deb; \
+    dpkg -i libstdc++5_3.3.6-34_i386.deb; \
+    rm libstdc++5_3.3.6-34_i386.deb;
 
 # Add local files
 COPY root/ /
