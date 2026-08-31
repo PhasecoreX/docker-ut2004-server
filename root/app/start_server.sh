@@ -62,6 +62,14 @@ if ! grep -Fxq "Paths=/data/addons/System/*.u" /data/config/UT2004.ini; then
     sed -i '/\[Core.System\]/a Paths=/data/addons/System/*.u' /data/config/UT2004.ini
 fi
 
+# Replace old Epic Games servers if they exist
+if grep -Fxq "MasterServerList=(Address=\"ut2004master1.epicgames.com\",Port=28902)" /data/config/UT2004.ini; then
+    sed -i '/MasterServerList=(Address="ut2004master1.epicgames.com",Port=28902)/c\MasterServerList=(Address="utmaster.openspy.net",Port=28902)' /data/config/UT2004.ini
+fi
+if grep -Fxq "MasterServerList=(Address=\"ut2004master2.epicgames.com\",Port=28902)" /data/config/UT2004.ini; then
+    sed -i '/MasterServerList=(Address="ut2004master2.epicgames.com",Port=28902)/c\MasterServerList=(Address="master.frag-net.com",Port=28902)' /data/config/UT2004.ini
+fi
+
 # If $CD_KEY is defined, update the server key
 if [ -n "${CD_KEY:-}" ]; then
     echo \"CDKey\"=\""${CD_KEY}"\" >/data/config/cdkey
